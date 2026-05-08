@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SOS Médico</title>
+    
+    <!-- Configuración de PWA y Apple -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d32f2f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icono integrado (SVG en Base64 para que no necesites archivo externo) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iI2QzMmYyZiIvPjxwYXRoIGQ9Ik0yNTYgMTAwdjMxMk0xMDAgMjU2aDMxMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iI2QzMmYyZiIvPjxwYXRoIGQ9Ik0yNTYgMTAwdjMxMk0xMDAgMjU2aDMxMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+">
+
+    <style>
+        :root { --red-emergency: #d32f2f; --dark-bg: #1a1a1a; --card-bg: #2d2d2d; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: var(--dark-bg); 
+            color: white; 
+            margin: 0;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card { 
+            width: 100%; 
+            max-width: 400px; 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            border-top: 10px solid var(--red-emergency); 
+            padding: 25px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 1.6rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        .data-group { margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .label { font-size: 0.75rem; color: #ff8a80; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
+        .value { font-size: 1.25rem; font-weight: 500; margin-top: 5px; color: #efefef; }
+
+        .contact-btn { 
+            display: block; 
+            background: var(--red-emergency); 
+            color: white; 
+            text-align: center; 
+            padding: 18px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+            margin-top: 25px; 
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
+        }
+        .contact-btn:active { transform: scale(0.96); background: #b71c1c; }
+
+        #edit-form { display: none; }
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border-radius: 8px; 
+            border: 1px solid #555; 
+            background: #1a1a1a; 
+            color: white; 
+            font-size: 16px; /* Evita zoom automático en iOS */
+        }
+
+        .btn-action { width: 100%; padding: 14px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 1rem; }
+        .save { background: #2e7d32; color: white; }
+        .toggle-edit { background: transparent; color: #bbb; border: 1px solid #555; margin-top: 30px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header"><h1>🆘 SOS MÉDICO</h1></div>
+
+    <!-- MODO VISTA -->
+    <div id="view-mode">
+        <div class="data-group"><div class="label">Nombre</div><div id="disp-nombre" class="value">---</div></div>
+        <div class="data-group"><div class="label">Sangre</div><div id="disp-sangre" class="value">---</div></div>
+        <div class="data-group"><div class="label">Alergias</div><div id="disp-alergias" class="value">---</div></div>
+        <div class="data-group"><div class="label">Notas</div><div id="disp-notas" class="value">---</div></div>
+        
+        <a id="disp-tel-link" href="#" class="contact-btn">📞 LLAMAR EMERGENCIA</a>
+        
+        <button class="btn-action toggle-edit" onclick="toggleEdit()">⚙️ EDITAR INFORMACIÓN</button>
+    </div>
+
+    <!-- MODO EDICIÓN -->
+    <div id="edit-form">
+        <label class="label">Nombre completo</label>
+        <input type="text" id="in-nombre">
+
+        <label class="label">Grupo Sanguíneo</label>
+        <select id="in-sangre">
+            <option value="">Seleccionar...</option>
+            <option value="A+">A+</option><option value="A-">A-</option>
+            <option value="B+">B+</option><option value="B-">B-</option>
+            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            <option value="O+">O+</option><option value="O-">O-</option>
+        </select>
+
+        <label class="label">Alergias</label>
+        <input type="text" id="in-alergias">
+
+        <label class="label">Notas / Enfermedades</label>
+        <input type="text" id="in-notas">
+
+        <label class="label">Teléfono de Emergencia</label>
+        <input type="tel" id="in-tel">
+
+        <button class="btn-action save" onclick="saveData()">💾 GUARDAR CAMBIOS</button>
+        <button class="btn-action toggle-edit" style="border:none" onclick="toggleEdit()">Cancelar</button>
+    </div>
+</div>
+
+<script>
+    function toggleEdit() {
+        const form = document.getElementById('edit-form');
+        const view = document.getElementById('view-mode');
+        const isEditing = form.style.display === 'block';
+        form.style.display = isEditing ? 'none' : 'block';
+        view.style.display = isEditing ? 'block' : 'none';
+        window.scrollTo(0,0);
+    }
+
+    function saveData() {
+        const data = {
+            nombre: document.getElementById('in-nombre').value.trim(),
+            sangre: document.getElementById('in-sangre').value,
+            alergias: document.getElementById('in-alergias').value.trim(),
+            notas: document.getElementById('in-notas').value.trim(),
+            tel: document.getElementById('in-tel').value.replace(/\D/g, '') // Deja solo números
+        };
+        localStorage.setItem('sosData', JSON.stringify(data));
+        loadData();
+        toggleEdit();
+    }
+
+    function loadData() {
+        const stored = localStorage.getItem('sosData');
+        if (stored) {
+            const data = JSON.parse(stored);
+            
+            // Llenar vista
+            document.getElementById('disp-nombre').innerText = data.nombre || '---';
+            document.getElementById('disp-sangre').innerText = data.sangre || '---';
+            document.getElementById('disp-alergias').innerText = data.alergias || '---';
+            document.getElementById('disp-notas').innerText = data.notas || '---';
+            
+            const btnLink = document.getElementById('disp-tel-link');
+            if(data.tel) {
+                btnLink.href = 'tel:' + data.tel;
+                btnLink.innerText = '📞 LLAMAR: ' + data.tel;
+                btnLink.style.display = 'block';
+            } else {
+                btnLink.style.display = 'none';
+            }
+
+            // Llenar inputs del formulario
+            document.getElementById('in-nombre').value = data.nombre || '';
+            document.getElementById('in-sangre').value = data.sangre || '';
+            document.getElementById('in-alergias').value = data.alergias || '';
+            document.getElementById('in-notas').value = data.notas || '';
+            document.getElementById('in-tel').value = data.tel || '';
+        }
+    }
+
+    window.onload = loadData;
+
+    // Registro de Service Worker (Necesario para modo offline)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+</script>
+
+</body>
+</html>
