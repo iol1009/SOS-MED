@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SOS Med</title>
     
-    <!-- Configuración de PWA y Apple -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#d32f2f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- Icono integrado (SVG en Base64 para que no necesites archivo externo) -->
+    <!-- Icono integrado -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iI2QzMmYyZiIvPjxwYXRoIGQ9Ik0yNTYgMTAwdjMxMk0xMDAgMjU2aDMxMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+">
     <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iI2QzMmYyZiIvPjxwYXRoIGQ9Ik0yNTYgMTAwdjMxMk0xMDAgMjU2aDMxMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+">
 
@@ -25,11 +24,28 @@
             color: white; 
             margin: 0;
             display: flex; 
-            justify-content: center; 
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
         }
+
+        /* Selector de Idioma */
+        .lang-selector {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .lang-btn {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .lang-btn.active { background: var(--red-emergency); font-weight: bold; }
 
         .card { 
             width: 100%; 
@@ -61,7 +77,6 @@
             margin-top: 25px; 
             box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
         }
-        .contact-btn:active { transform: scale(0.96); background: #b71c1c; }
 
         #edit-form { display: none; }
         input, select { 
@@ -72,7 +87,7 @@
             border: 1px solid #555; 
             background: #1a1a1a; 
             color: white; 
-            font-size: 16px; /* Evita zoom automático en iOS */
+            font-size: 16px; 
         }
 
         .btn-action { width: 100%; padding: 14px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 1rem; }
@@ -82,27 +97,32 @@
 </head>
 <body>
 
+<div class="lang-selector">
+    <button class="lang-btn active" id="btn-es" onclick="setLanguage('es')">Español</button>
+    <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">English</button>
+</div>
+
 <div class="card">
-    <div class="header"><h1>🆘 SOS Med</h1></div>
+    <div class="header"><h1 id="txt-title">🆘 SOS MED</h1></div>
 
     <!-- MODO VISTA -->
     <div id="view-mode">
-        <div class="data-group"><div class="label">Nombre</div><div id="disp-nombre" class="value">---</div></div>
-        <div class="data-group"><div class="label">Sangre</div><div id="disp-sangre" class="value">---</div></div>
-        <div class="data-group"><div class="label">Alergias</div><div id="disp-alergias" class="value">---</div></div>
-        <div class="data-group"><div class="label">Notas</div><div id="disp-notas" class="value">---</div></div>
+        <div class="data-group"><div class="label" id="lbl-nombre">Nombre</div><div id="disp-nombre" class="value">---</div></div>
+        <div class="data-group"><div class="label" id="lbl-sangre">Sangre</div><div id="disp-sangre" class="value">---</div></div>
+        <div class="data-group"><div class="label" id="lbl-alergias">Alergias</div><div id="disp-alergias" class="value">---</div></div>
+        <div class="data-group"><div class="label" id="lbl-notas">Notas</div><div id="disp-notas" class="value">---</div></div>
         
         <a id="disp-tel-link" href="#" class="contact-btn">📞 LLAMAR EMERGENCIA</a>
         
-        <button class="btn-action toggle-edit" onclick="toggleEdit()">⚙️ EDITAR INFORMACIÓN</button>
+        <button class="btn-action toggle-edit" id="btn-edit-main" onclick="toggleEdit()">⚙️ EDITAR INFORMACIÓN</button>
     </div>
 
     <!-- MODO EDICIÓN -->
     <div id="edit-form">
-        <label class="label">Nombre completo</label>
+        <label class="label" id="in-lbl-nombre">Nombre completo</label>
         <input type="text" id="in-nombre">
 
-        <label class="label">Grupo Sanguíneo</label>
+        <label class="label" id="in-lbl-sangre">Grupo Sanguíneo</label>
         <select id="in-sangre">
             <option value="">Seleccionar...</option>
             <option value="A+">A+</option><option value="A-">A-</option>
@@ -111,28 +131,95 @@
             <option value="O+">O+</option><option value="O-">O-</option>
         </select>
 
-        <label class="label">Alergias</label>
+        <label class="label" id="in-lbl-alergias">Alergias</label>
         <input type="text" id="in-alergias">
 
-        <label class="label">Notas / Enfermedades</label>
+        <label class="label" id="in-lbl-notas">Notas / Enfermedades</label>
         <input type="text" id="in-notas">
 
-        <label class="label">Teléfono de Emergencia</label>
+        <label class="label" id="in-lbl-tel">Teléfono de Emergencia</label>
         <input type="tel" id="in-tel">
 
-        <button class="btn-action save" onclick="saveData()">💾 GUARDAR CAMBIOS</button>
-        <button class="btn-action toggle-edit" style="border:none" onclick="toggleEdit()">Cancelar</button>
+        <button class="btn-action save" id="btn-save" onclick="saveData()">💾 GUARDAR CAMBIOS</button>
+        <button class="btn-action toggle-edit" id="btn-cancel" style="border:none" onclick="toggleEdit()">Cancelar</button>
     </div>
 </div>
 
 <script>
+    let currentLang = 'es';
+
+    const translations = {
+        es: {
+            title: "🆘 SOS MED",
+            nombre: "Nombre",
+            sangre: "Sangre",
+            alergias: "Alergias",
+            notas: "Notas",
+            call: "📞 LLAMAR EMERGENCIA",
+            edit: "⚙️ EDITAR INFORMACIÓN",
+            inNombre: "Nombre completo",
+            inSangre: "Grupo Sanguíneo",
+            inAlergias: "Alergias",
+            inNotas: "Notas / Enfermedades",
+            inTel: "Teléfono de Emergencia",
+            save: "💾 GUARDAR CAMBIOS",
+            cancel: "Cancelar",
+            select: "Seleccionar..."
+        },
+        en: {
+            title: "🆘 SOS MED",
+            nombre: "Full Name",
+            sangre: "Blood Type",
+            alergias: "Allergies",
+            notas: "Medical Notes",
+            call: "📞 CALL EMERGENCY",
+            edit: "⚙️ EDIT INFORMATION",
+            inNombre: "Full name",
+            inSangre: "Blood Group",
+            inAlergias: "Allergies",
+            inNotas: "Medical Notes / Conditions",
+            inTel: "Emergency Phone",
+            save: "💾 SAVE CHANGES",
+            cancel: "Cancel",
+            select: "Select..."
+        }
+    };
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('sosLang', lang);
+        
+        // Actualizar UI
+        const t = translations[lang];
+        document.getElementById('txt-title').innerText = t.title;
+        document.getElementById('lbl-nombre').innerText = t.nombre;
+        document.getElementById('lbl-sangre').innerText = t.sangre;
+        document.getElementById('lbl-alergias').innerText = t.alergias;
+        document.getElementById('lbl-notas').innerText = t.notas;
+        document.getElementById('btn-edit-main').innerText = t.edit;
+        
+        document.getElementById('in-lbl-nombre').innerText = t.inNombre;
+        document.getElementById('in-lbl-sangre').innerText = t.inSangre;
+        document.getElementById('in-lbl-alergias').innerText = t.inAlergias;
+        document.getElementById('in-lbl-notas').innerText = t.inNotas;
+        document.getElementById('in-lbl-tel').innerText = t.inTel;
+        document.getElementById('btn-save').innerText = t.save;
+        document.getElementById('btn-cancel').innerText = t.cancel;
+        
+        // El botón de llamada se actualiza solo si no hay número
+        loadData();
+
+        // Estilo de botones de idioma
+        document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    }
+
     function toggleEdit() {
         const form = document.getElementById('edit-form');
         const view = document.getElementById('view-mode');
         const isEditing = form.style.display === 'block';
         form.style.display = isEditing ? 'none' : 'block';
         view.style.display = isEditing ? 'block' : 'none';
-        window.scrollTo(0,0);
     }
 
     function saveData() {
@@ -141,7 +228,7 @@
             sangre: document.getElementById('in-sangre').value,
             alergias: document.getElementById('in-alergias').value.trim(),
             notas: document.getElementById('in-notas').value.trim(),
-            tel: document.getElementById('in-tel').value.replace(/\D/g, '') // Deja solo números
+            tel: document.getElementById('in-tel').value.replace(/\D/g, '')
         };
         localStorage.setItem('sosData', JSON.stringify(data));
         loadData();
@@ -150,10 +237,10 @@
 
     function loadData() {
         const stored = localStorage.getItem('sosData');
+        const t = translations[currentLang];
+        
         if (stored) {
             const data = JSON.parse(stored);
-            
-            // Llenar vista
             document.getElementById('disp-nombre').innerText = data.nombre || '---';
             document.getElementById('disp-sangre').innerText = data.sangre || '---';
             document.getElementById('disp-alergias').innerText = data.alergias || '---';
@@ -162,13 +249,12 @@
             const btnLink = document.getElementById('disp-tel-link');
             if(data.tel) {
                 btnLink.href = 'tel:' + data.tel;
-                btnLink.innerText = '📞 LLAMAR: ' + data.tel;
+                btnLink.innerText = (currentLang === 'es' ? '📞 LLAMAR: ' : '📞 CALL: ') + data.tel;
                 btnLink.style.display = 'block';
             } else {
                 btnLink.style.display = 'none';
             }
 
-            // Llenar inputs del formulario
             document.getElementById('in-nombre').value = data.nombre || '';
             document.getElementById('in-sangre').value = data.sangre || '';
             document.getElementById('in-alergias').value = data.alergias || '';
@@ -177,13 +263,15 @@
         }
     }
 
-    window.onload = loadData;
+    window.onload = () => {
+        const savedLang = localStorage.getItem('sosLang') || 'es';
+        setLanguage(savedLang);
+    };
 
-    // Registro de Service Worker (Necesario para modo offline)
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 </script>
 
 </body>
-</html> 
+</html>
