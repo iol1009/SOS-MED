@@ -1,6 +1,6 @@
 {
-  "name": "SOS Médico",
-  "short_name": "SOS",
+  "name": "SOS Med",
+  "short_name": "SOS Med",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#1a1a1a",
